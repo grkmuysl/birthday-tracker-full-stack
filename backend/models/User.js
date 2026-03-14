@@ -12,7 +12,7 @@ userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
 
   try {
-    const salt = brcypt.genSalt(9);
+    const salt = await brcypt.genSalt(9);
     this.password = await brcypt.hash(this.password, salt);
   } catch (error) {
     console.log("error occured in password hashing", error);
