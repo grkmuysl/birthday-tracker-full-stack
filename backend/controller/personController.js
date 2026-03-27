@@ -76,3 +76,37 @@ exports.updatePerson = async (req, res, next) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+exports.getUpcomingPersons = async (req, res, next) => {
+  try {
+    const today = new Date();
+    const ownerId = req.user.id;
+    const allPersons = await Person.find({ owner: ownerId });
+    let upcomingBirthdays = [];
+
+    allPersons.forEach((person) => {
+      const birthday = new Date(
+        today.getFullYear(),
+        person.date.getMonth(),
+        person.date.getDate(),
+      );
+      let diffDays = (birthday - today) / (1000 * 60 * 60 * 24);
+
+      if (diffDays < 0) {
+        birthday.setFullYear(today.getFullYear() + 1);
+        diffDays = (birthday - today) / (1000 * 60 * 60 * 24);
+      }
+
+      if (diffDays > 0 && diffDays < 30) {
+        upcomingBirthdays.push(person);
+      }
+    });
+
+    res.status(200).json({
+      message: "upcoimg birthdays",
+      data: upcomingBirthdays,
+    });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
